@@ -14,9 +14,7 @@ export default function Post({
       onClick={() => onClick(id)}
       className="p-4 border border-white rounded-lg cursor-pointer hover:bg-gray-800 transition-colors"
     >
-      <p className="text-gray-200">{id}</p>
       <h1 className="text-2xl font-bold text-gray-100">{title}</h1>
-      <p className="text-gray-200">{author}</p>
     </div>
   );
 }

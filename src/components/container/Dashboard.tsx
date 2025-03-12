@@ -1,30 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PostModel from "../../types/Post";
 import Posts from "../posts/Posts";
 import PostDetails from "../posts/PostDetails";
 
-const postData: PostModel[] = [
-  {
-    id: 1,
-    title: "Post 1",
-    author: "Author 1",
-  },
-  {
-    id: 2,
-    title: "Post 2",
-    author: "Author 2",
-  },
-  {
-    id: 3,
-    title: "Post 3",
-    author: "Author 3",
-  },
-];
-
 export default function Dashboard() {
-  const [posts, setPosts] = useState<PostModel[]>(postData);
+  const [posts, setPosts] = useState<PostModel[]>([]);
   const [input, setInput] = useState<string>("");
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const [addNew, setAddNew] = useState<boolean>(false);
   const updateFirstTitle = (title: string) => {
     return setPosts((p) =>
       p.map((post, index) => {
@@ -34,20 +17,40 @@ export default function Dashboard() {
     );
   };
 
+  useEffect(() => {
+    fetch("http://localhost:8080/posts")
+      .then((response) => response.json())
+      .then((data) => {
+        setPosts(
+          data.map((post: PostModel) => {
+            return {
+              id: post.id,
+              title: post.title,
+            };
+          })
+        );
+      });
+  }, []);
+
   const onPostClicked = (id: number) => {
     setSelectedPostId(id);
   };
 
-  const editSelectedPostTitle = (title: string) => {
+  const editSelectedPostTitle = (updatedPost: PostModel) => {
     if (selectedPostId !== null) {
       setPosts((p) =>
         p.map((post) => {
-          if (post.id === selectedPostId) return { ...post, title };
+          if (post.id === selectedPostId) return updatedPost;
           return post;
         })
       );
       setSelectedPostId(null);
     }
+  };
+
+  const onCreate = (post: PostModel) => {
+    setPosts((p) => [...p, post]);
+    setAddNew(false);
   };
 
   const deleteSelectedPost = () => {
@@ -77,11 +80,20 @@ export default function Dashboard() {
         >
           Submit
         </button>
+        <button
+          className="mt-2 bg-red-500 text-white p-2 rounded"
+          onClick={() => {
+            setAddNew(true);
+          }}
+        >
+          Add New
+        </button>
       </div>
-      {selectedPostId && (
+      {(selectedPostId || addNew) && (
         <PostDetails
-          title={posts.find((p) => p.id == selectedPostId)!.title}
+          id={selectedPostId}
           onEdit={editSelectedPostTitle}
+          onCreate={onCreate}
           onDelete={deleteSelectedPost}
         />
       )}
