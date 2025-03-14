@@ -3,12 +3,14 @@ import PostModel from "../../types/Post";
 import Posts from "../posts/Posts";
 import PostDetails from "../posts/PostDetails";
 import { usePost } from "../../context/PostContext";
+import { useNavigate } from "react-router";
 
 export default function Dashboard() {
   const [posts, setPosts] = useState<PostModel[]>([]);
   const [input, setInput] = useState<string>("");
   const { selectedId, setSelectedId } = usePost();
   const [addNew, setAddNew] = useState<boolean>(false);
+  const navigate = useNavigate();
   const updateFirstTitle = (title: string) => {
     return setPosts((p) =>
       p.map((post, index) => {
@@ -35,30 +37,7 @@ export default function Dashboard() {
 
   const onPostClicked = (id: number) => {
     setSelectedId(id);
-  };
-
-  const editSelectedPostTitle = (updatedPost: PostModel) => {
-    if (selectedId !== null) {
-      setPosts((p) =>
-        p.map((post) => {
-          if (post.id === selectedId) return updatedPost;
-          return post;
-        })
-      );
-      setSelectedId(null);
-    }
-  };
-
-  const onCreate = (post: PostModel) => {
-    setPosts((p) => [...p, post]);
-    setAddNew(false);
-  };
-
-  const deleteSelectedPost = () => {
-    if (selectedId !== null) {
-      setPosts((p) => p.filter((post) => post.id !== selectedId));
-      setSelectedId(null);
-    }
+    navigate("/createOrUpdate");
   };
 
   return (
@@ -85,19 +64,12 @@ export default function Dashboard() {
           className="mt-2 bg-red-500 text-white p-2 rounded"
           onClick={() => {
             setAddNew(true);
+            navigate("/createOrUpdate");
           }}
         >
           Add New
         </button>
       </div>
-      {(selectedId || addNew) && (
-        <PostDetails
-          id={selectedId}
-          onEdit={editSelectedPostTitle}
-          onCreate={onCreate}
-          onDelete={deleteSelectedPost}
-        />
-      )}
     </div>
   );
 }

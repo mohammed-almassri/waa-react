@@ -1,14 +1,22 @@
+import { BrowserRouter, Route, Routes } from "react-router";
 import "./App.css";
 import Dashboard from "./components/container/Dashboard";
-import PostProvider from "./context/PostContext";
+import NewPost from "./components/container/NewPost";
+import Layout from "./components/container/Layout";
+import Login from "./components/container/Login";
 
 function App() {
   return (
-    <div>
-      <PostProvider>
-        <Dashboard></Dashboard>
-      </PostProvider>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/createOrUpdate" element={<NewPost />} />
+        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<h1>Not Found</h1>} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
