@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import PostModel from "../../types/Post";
 import Posts from "../posts/Posts";
 import PostDetails from "../posts/PostDetails";
+import { usePost } from "../../context/PostContext";
 
 export default function Dashboard() {
   const [posts, setPosts] = useState<PostModel[]>([]);
   const [input, setInput] = useState<string>("");
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const { selectedId, setSelectedId } = usePost();
   const [addNew, setAddNew] = useState<boolean>(false);
   const updateFirstTitle = (title: string) => {
     return setPosts((p) =>
@@ -33,18 +34,18 @@ export default function Dashboard() {
   }, []);
 
   const onPostClicked = (id: number) => {
-    setSelectedPostId(id);
+    setSelectedId(id);
   };
 
   const editSelectedPostTitle = (updatedPost: PostModel) => {
-    if (selectedPostId !== null) {
+    if (selectedId !== null) {
       setPosts((p) =>
         p.map((post) => {
-          if (post.id === selectedPostId) return updatedPost;
+          if (post.id === selectedId) return updatedPost;
           return post;
         })
       );
-      setSelectedPostId(null);
+      setSelectedId(null);
     }
   };
 
@@ -54,9 +55,9 @@ export default function Dashboard() {
   };
 
   const deleteSelectedPost = () => {
-    if (selectedPostId !== null) {
-      setPosts((p) => p.filter((post) => post.id !== selectedPostId));
-      setSelectedPostId(null);
+    if (selectedId !== null) {
+      setPosts((p) => p.filter((post) => post.id !== selectedId));
+      setSelectedId(null);
     }
   };
 
@@ -89,9 +90,9 @@ export default function Dashboard() {
           Add New
         </button>
       </div>
-      {(selectedPostId || addNew) && (
+      {(selectedId || addNew) && (
         <PostDetails
-          id={selectedPostId}
+          id={selectedId}
           onEdit={editSelectedPostTitle}
           onCreate={onCreate}
           onDelete={deleteSelectedPost}

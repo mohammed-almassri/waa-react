@@ -1,4 +1,4 @@
-import React, { use, useCallback, useEffect, useState } from "react";
+import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import PostModel from "../../types/Post";
 interface PostDetailsProps {
   id: number | null;
@@ -13,8 +13,10 @@ export default function PostDetails({
   onCreate,
   onDelete,
 }: PostDetailsProps) {
-  const [newTitle, setNewTitle] = useState("");
-  const [newContent, setNewContent] = useState("");
+  // const [newTitle, setNewTitle] = useState("");
+  // const [newContent, setNewContent] = useState("");
+  const titleRef = useRef<HTMLTextAreaElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
   const [loading, setLoading] = useState(true);
   const fetchPost = async () => {
     try {
@@ -24,8 +26,10 @@ export default function PostDetails({
       if (!response.ok) {
         throw new Error("failed to fetch post");
       }
-      setNewTitle(data.title);
-      setNewContent(data.content);
+      // setNewTitle(data.title);
+      // setNewContent(data.content);
+      titleRef.current!.value = data.title;
+      contentRef.current!.value = data.content;
     } catch (e) {
       console.error(e);
     } finally {
@@ -39,7 +43,10 @@ export default function PostDetails({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title: newTitle, content: newContent }),
+      body: JSON.stringify({
+        title: titleRef.current?.value,
+        content: contentRef.current?.value,
+      }),
     });
     if (response.ok) {
       console.log("updated");
@@ -54,8 +61,8 @@ export default function PostDetails({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        title: newTitle,
-        content: newContent,
+        title: titleRef.current?.value,
+        content: contentRef.current?.value,
         userId: 1,
       }),
     });
@@ -92,13 +99,15 @@ export default function PostDetails({
     <div className="p-4 rounded shadow-md">
       <textarea
         className="w-full p-2 border rounded"
-        value={newTitle}
-        onChange={(e) => setNewTitle(e.target.value)}
+        // value={newTitle}
+        // onChange={(e) => setNewTitle(e.target.value)}
+        ref={titleRef}
       />
       <textarea
         className="w-full p-2 border rounded mt-2"
-        value={newContent}
-        onChange={(e) => setNewContent(e.target.value)}
+        // value={newContent}
+        // onChange={(e) => setNewContent(e.target.value)}
+        ref={contentRef}
       />
       <div className="mt-4 flex space-x-2">
         <button
